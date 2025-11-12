@@ -53,10 +53,15 @@ const LoanDistributionChart = ({ data }: LoanDistributionChartProps) => {
   };
 
   return (
-    <div className="bg-card rounded-lg border border-border p-6 shadow-card">
-      <h3 className="text-lg font-semibold text-foreground mb-6">
-        Loan Distribution by Type
-      </h3>
+    <div className="bg-card rounded-xl border border-border/50 p-6 shadow-sm">
+      <div className="mb-6">
+        <h3 className="text-lg font-bold text-foreground">
+          Loan Distribution by Type
+        </h3>
+        <p className="text-sm text-muted-foreground mt-1">
+          Portfolio breakdown by loan category
+        </p>
+      </div>
       <div className="h-80" aria-label="Loan Distribution Pie Chart">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>

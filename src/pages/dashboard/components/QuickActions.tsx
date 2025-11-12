@@ -17,7 +17,7 @@ const QuickActions = () => {
   };
 
   return (
-    <div className="flex flex-col sm:flex-row gap-4 mb-8">
+    <div className="flex flex-col sm:flex-row gap-3 mb-8">
       <Button
         variant="default"
         size="lg"
@@ -25,7 +25,7 @@ const QuickActions = () => {
         iconName="Plus"
         iconPosition="left"
         iconSize={20}
-        className="flex-1 sm:flex-none"
+        className="flex-1 sm:flex-none shadow-sm hover:shadow-md transition-shadow"
       >
         Add New Loan
       </Button>
@@ -36,7 +36,7 @@ const QuickActions = () => {
         iconName="Upload"
         iconPosition="left"
         iconSize={20}
-        className="flex-1 sm:flex-none"
+        className="flex-1 sm:flex-none hover:bg-muted transition-colors"
       >
         Upload Documents
       </Button>

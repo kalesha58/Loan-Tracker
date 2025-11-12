@@ -53,24 +53,27 @@ const StatsOverview = ({ stats }: StatsOverviewProps) => {
       {statsItems.map((item, index) => (
         <div
           key={index}
-          className="bg-card rounded-lg border border-border p-4 shadow-card"
+          className="group bg-card rounded-xl border border-border/50 p-5 shadow-sm hover:shadow-md hover:border-border transition-all duration-300"
         >
-          <div className="flex items-center space-x-3">
+          <div className="flex flex-col space-y-3">
             <div
-              className="w-10 h-10 rounded-lg flex items-center justify-center"
-              style={{ backgroundColor: item.bgColor }}
+              className="w-12 h-12 rounded-xl flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform duration-300"
+              style={{ 
+                backgroundColor: item.bgColor,
+                border: `1px solid ${item.color}20`
+              }}
             >
               <Icon
                 name={item.icon}
-                size={20}
+                size={22}
                 color={item.color}
               />
             </div>
             <div className="flex-1 min-w-0">
-              <div className="text-lg font-semibold text-foreground truncate">
+              <div className="text-2xl font-bold text-foreground truncate mb-1">
                 {item.value}
               </div>
-              <div className="text-sm text-muted-foreground">
+              <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
                 {item.label}
               </div>
             </div>

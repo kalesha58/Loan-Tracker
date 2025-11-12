@@ -89,46 +89,47 @@ const PaymentHistory = ({ payments, onRecordPayment }: PaymentHistoryProps) => {
     .reduce((sum, p) => sum + p.amount, 0);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-success/5 border border-success/20 rounded-lg p-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+        <div className="bg-success/5 border border-success/20 rounded-lg p-3 sm:p-4">
           <div className="flex items-center gap-2 mb-2">
-            <Icon name="TrendingUp" size={20} className="text-success" />
-            <span className="text-sm font-medium text-success">Total Paid</span>
+            <Icon name="TrendingUp" size={18} className="sm:w-5 sm:h-5 text-success" />
+            <span className="text-xs sm:text-sm font-medium text-success">Total Paid</span>
           </div>
-          <p className="text-2xl font-semibold text-foreground">
+          <p className="text-xl sm:text-2xl font-semibold text-foreground break-words">
             {formatCurrency(totalPaid)}
           </p>
         </div>
-        <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
+        <div className="bg-primary/5 border border-primary/20 rounded-lg p-3 sm:p-4">
           <div className="flex items-center gap-2 mb-2">
-            <Icon name="Calendar" size={20} className="text-primary" />
-            <span className="text-sm font-medium text-primary">Total Payments</span>
+            <Icon name="Calendar" size={18} className="sm:w-5 sm:h-5 text-primary" />
+            <span className="text-xs sm:text-sm font-medium text-primary">Total Payments</span>
           </div>
-          <p className="text-2xl font-semibold text-foreground">
+          <p className="text-xl sm:text-2xl font-semibold text-foreground">
             {payments.filter(p => p.status === 'completed').length}
           </p>
         </div>
-        <div className="bg-warning/5 border border-warning/20 rounded-lg p-4">
+        <div className="bg-warning/5 border border-warning/20 rounded-lg p-3 sm:p-4">
           <div className="flex items-center gap-2 mb-2">
-            <Icon name="Clock" size={20} className="text-warning" />
-            <span className="text-sm font-medium text-warning">Pending</span>
+            <Icon name="Clock" size={18} className="sm:w-5 sm:h-5 text-warning" />
+            <span className="text-xs sm:text-sm font-medium text-warning">Pending</span>
           </div>
-          <p className="text-2xl font-semibold text-foreground">
+          <p className="text-xl sm:text-2xl font-semibold text-foreground">
             {payments.filter(p => p.status === 'pending').length}
           </p>
         </div>
       </div>
 
       {/* Record Payment Button */}
-      <div className="flex justify-between items-center">
-        <h3 className="text-lg font-semibold text-foreground">Payment History</h3>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0">
+        <h3 className="text-base sm:text-lg font-semibold text-foreground">Payment History</h3>
         <Button
           variant="default"
           iconName="Plus"
           iconPosition="left"
           onClick={() => setShowRecordForm(true)}
+          className="w-full sm:w-auto"
         >
           Record Payment
         </Button>
@@ -136,7 +137,7 @@ const PaymentHistory = ({ payments, onRecordPayment }: PaymentHistoryProps) => {
 
       {/* Record Payment Form */}
       {showRecordForm && (
-        <div className="bg-card border border-border rounded-lg p-6">
+        <div className="bg-card border border-border rounded-lg p-4 sm:p-6">
           <div className="flex items-center justify-between mb-4">
             <h4 className="text-lg font-medium text-foreground">Record New Payment</h4>
             <Button
@@ -146,7 +147,7 @@ const PaymentHistory = ({ payments, onRecordPayment }: PaymentHistoryProps) => {
               onClick={() => setShowRecordForm(false)}
             />
           </div>
-          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <Input
               label="Payment Amount"
               type="number"
@@ -187,14 +188,15 @@ const PaymentHistory = ({ payments, onRecordPayment }: PaymentHistoryProps) => {
               onChange={(e) => setFormData({ ...formData, interestAmount: e.target.value })}
               required
             />
-            <div className="md:col-span-2 flex gap-3 pt-4">
-              <Button type="submit" variant="default">
+            <div className="sm:col-span-2 flex flex-col sm:flex-row gap-2 sm:gap-3 pt-3 sm:pt-4">
+              <Button type="submit" variant="default" className="w-full sm:w-auto">
                 Record Payment
               </Button>
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => setShowRecordForm(false)}
+                className="w-full sm:w-auto"
               >
                 Cancel
               </Button>
@@ -208,37 +210,37 @@ const PaymentHistory = ({ payments, onRecordPayment }: PaymentHistoryProps) => {
         {payments.map((payment) => (
           <div
             key={payment.id}
-            className="bg-card border border-border rounded-lg p-4 hover:shadow-card transition-shadow"
+            className="bg-card border border-border rounded-lg p-3 sm:p-4 hover:shadow-card transition-shadow"
           >
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-              <div className="flex items-start gap-4">
+            <div className="flex flex-col gap-3 sm:gap-4">
+              <div className="flex items-start gap-3 sm:gap-4">
                 <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
                   <Icon name="CreditCard" size={20} className="text-primary" />
                 </div>
                 
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h4 className="font-medium text-foreground">
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-1">
+                    <h4 className="font-medium text-base sm:text-lg text-foreground">
                       {formatCurrency(payment.amount)}
                     </h4>
-                    <div className={`px-2 py-1 rounded text-xs font-medium border ${getStatusColor(payment.status)}`}>
+                    <div className={`px-2 py-0.5 sm:py-1 rounded text-xs font-medium border flex-shrink-0 ${getStatusColor(payment.status)}`}>
                       {payment.status}
                     </div>
                   </div>
                   
-                  <p className="text-sm text-muted-foreground mb-2">
+                  <p className="text-xs sm:text-sm text-muted-foreground mb-2">
                     {payment.paymentMethod} • {formatDate(payment.paymentDate)}
                   </p>
                   
-                  <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 text-xs text-muted-foreground">
                     <span>Principal: {formatCurrency(payment.principalAmount)}</span>
                     <span>Interest: {formatCurrency(payment.interestAmount)}</span>
-                    <span>TXN: {payment.transactionId}</span>
+                    <span className="truncate">TXN: {payment.transactionId}</span>
                   </div>
                 </div>
               </div>
-              <div className="text-right">
-                <p className="text-sm font-medium text-foreground">
+              <div className="pl-[52px] sm:pl-14">
+                <p className="text-xs sm:text-sm font-medium text-foreground">
                   Balance: {formatCurrency(payment.remainingBalance)}
                 </p>
               </div>

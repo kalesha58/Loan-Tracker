@@ -32,10 +32,11 @@ const RecentLoansPreview = ({ loans }: RecentLoansPreviewProps) => {
   const getStatusBadge = (status: string, color: string) => {
     return (
       <span
-        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium`}
+        className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border`}
         style={{
-          backgroundColor: `${color}15`,
-          color: color
+          backgroundColor: `${color}10`,
+          color: color,
+          borderColor: `${color}30`
         }}
       >
         {status}
@@ -52,12 +53,17 @@ const RecentLoansPreview = ({ loans }: RecentLoansPreviewProps) => {
   };
 
   return (
-    <div className="bg-card rounded-lg border border-border shadow-card">
-      <div className="p-6 border-b border-border">
+    <div className="bg-card rounded-xl border border-border/50 shadow-sm">
+      <div className="p-6 border-b border-border/50">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-foreground">
-            Recent Loans
-          </h3>
+          <div>
+            <h3 className="text-xl font-bold text-foreground">
+              Recent Loans
+            </h3>
+            <p className="text-sm text-muted-foreground mt-1">
+              Latest loan applications and updates
+            </p>
+          </div>
           <Button
             variant="outline"
             size="sm"
@@ -65,52 +71,62 @@ const RecentLoansPreview = ({ loans }: RecentLoansPreviewProps) => {
             iconName="ArrowRight"
             iconPosition="right"
             iconSize={16}
+            className="hover:bg-primary hover:text-primary-foreground transition-colors"
           >
             View All
           </Button>
         </div>
       </div>
-      <div className="divide-y divide-border">
+      <div className="divide-y divide-border/50">
         {loans.length === 0 ? (
-          <div className="p-6 text-center">
-            <Icon name="FileText" size={48} className="text-muted-foreground mx-auto mb-3" />
-            <p className="text-muted-foreground">No recent loans</p>
+          <div className="p-12 text-center">
+            <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
+              <Icon name="FileText" size={32} className="text-muted-foreground" />
+            </div>
+            <p className="text-muted-foreground font-medium">No recent loans</p>
+            <p className="text-sm text-muted-foreground mt-1">New loans will appear here</p>
           </div>
         ) : (
           loans.map((loan) => (
             <div
               key={loan.id}
-              className="p-4 hover:bg-muted/50 transition-smooth cursor-pointer"
+              className="p-5 hover:bg-muted/30 transition-all duration-200 cursor-pointer group"
               onClick={() => handleViewLoan(loan.id)}
             >
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-4">
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center space-x-3 mb-2">
-                    <h4 className="text-sm font-medium text-foreground truncate">
+                  <div className="flex items-center gap-3 mb-3 flex-wrap">
+                    <h4 className="text-base font-semibold text-foreground truncate">
                       {loan.borrowerName}
                     </h4>
                     {getStatusBadge(loan.status, loan.statusColor)}
                   </div>
-                  <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-                    <span className="flex items-center space-x-1">
-                      <Icon name="Hash" size={14} />
-                      <span>{loan.id}</span>
+                  <div className="flex items-center gap-5 text-sm text-muted-foreground flex-wrap">
+                    <span className="flex items-center gap-1.5">
+                      <Icon name="Hash" size={14} className="text-muted-foreground/70" />
+                      <span className="font-medium">{loan.id}</span>
                     </span>
-                    <span className="flex items-center space-x-1">
-                      <Icon name="Tag" size={14} />
+                    <span className="flex items-center gap-1.5">
+                      <Icon name="Tag" size={14} className="text-muted-foreground/70" />
                       <span>{loan.type}</span>
                     </span>
-                    <span className="flex items-center space-x-1">
-                      <Icon name="Calendar" size={14} />
+                    <span className="flex items-center gap-1.5">
+                      <Icon name="Calendar" size={14} className="text-muted-foreground/70" />
                       <span>Due: {formatDate(loan.nextDueDate)}</span>
                     </span>
                   </div>
                 </div>
-                <div className="text-right ml-4">
-                  <div className="text-lg font-semibold text-foreground">
-                    {formatCurrency(loan.amount)}
+                <div className="flex items-center gap-4">
+                  <div className="text-right">
+                    <div className="text-xl font-bold text-foreground">
+                      {formatCurrency(loan.amount)}
+                    </div>
                   </div>
-                  <Icon name="ChevronRight" size={16} className="text-muted-foreground ml-auto" />
+                  <Icon 
+                    name="ChevronRight" 
+                    size={18} 
+                    className="text-muted-foreground group-hover:text-foreground group-hover:translate-x-1 transition-all duration-200" 
+                  />
                 </div>
               </div>
             </div>

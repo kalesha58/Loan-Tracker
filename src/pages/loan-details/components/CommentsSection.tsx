@@ -72,31 +72,32 @@ const CommentsSection = ({ comments, onAddComment }: CommentsSectionProps) => {
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Add Comment Form */}
-      <div className="bg-card border border-border rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-foreground mb-4">Add Internal Comment</h3>
+      <div className="bg-card border border-border rounded-lg p-4 sm:p-6">
+        <h3 className="text-base sm:text-lg font-semibold text-foreground mb-3 sm:mb-4">Add Internal Comment</h3>
         
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
           <div>
             <textarea
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
               placeholder="Add your comment or note about this loan..."
-              className="w-full min-h-24 px-3 py-2 border border-border rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
+              className="w-full min-h-24 px-3 py-2 text-sm sm:text-base border border-border rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
               disabled={isSubmitting}
             />
           </div>
           
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0">
             <Checkbox
               label="Private comment (visible only to internal team)"
               checked={isPrivate}
               onChange={(e) => setIsPrivate(e.target.checked)}
               disabled={isSubmitting}
+              className="text-xs sm:text-sm"
             />
             
-            <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
               <Button
                 type="button"
                 variant="outline"
@@ -105,6 +106,7 @@ const CommentsSection = ({ comments, onAddComment }: CommentsSectionProps) => {
                   setIsPrivate(false);
                 }}
                 disabled={isSubmitting}
+                className="w-full sm:w-auto"
               >
                 Clear
               </Button>
@@ -115,6 +117,7 @@ const CommentsSection = ({ comments, onAddComment }: CommentsSectionProps) => {
                 disabled={!newComment.trim()}
                 iconName="Send"
                 iconPosition="left"
+                className="w-full sm:w-auto"
               >
                 Add Comment
               </Button>
@@ -124,21 +127,21 @@ const CommentsSection = ({ comments, onAddComment }: CommentsSectionProps) => {
       </div>
 
       {/* Comments List */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-foreground">
+      <div className="space-y-3 sm:space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
+          <h3 className="text-base sm:text-lg font-semibold text-foreground">
             Comments ({comments.length})
           </h3>
           
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Icon name="Lock" size={14} />
+          <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
+            <Icon name="Lock" size={12} className="sm:w-3.5 sm:h-3.5" />
             <span>Internal use only</span>
           </div>
         </div>
         {sortedComments.map((comment) => (
           <div
             key={comment.id}
-            className={`bg-card border rounded-lg p-4 ${
+            className={`bg-card border rounded-lg p-3 sm:p-4 ${
               comment.isPrivate ? 'border-warning/30 bg-warning/5' : 'border-border'
             }`}
           >
@@ -150,25 +153,25 @@ const CommentsSection = ({ comments, onAddComment }: CommentsSectionProps) => {
               </div>
               
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-2">
-                  <h4 className="font-medium text-foreground">
+                <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-2">
+                  <h4 className="font-medium text-sm sm:text-base text-foreground">
                     {comment.author}
                   </h4>
-                  <div className={`px-2 py-1 rounded text-xs font-medium border ${getRoleColor(comment.authorRole)}`}>
+                  <div className={`px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-xs font-medium border ${getRoleColor(comment.authorRole)}`}>
                     {comment.authorRole}
                   </div>
                   {comment.isPrivate && (
-                    <div className="flex items-center gap-1 px-2 py-1 rounded text-xs font-medium text-warning bg-warning/10 border border-warning/20">
-                      <Icon name="Lock" size={12} />
-                      Private
+                    <div className="flex items-center gap-1 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-xs font-medium text-warning bg-warning/10 border border-warning/20">
+                      <Icon name="Lock" size={10} className="sm:w-3 sm:h-3" />
+                      <span className="hidden sm:inline">Private</span>
                     </div>
                   )}
-                  <span className="text-xs text-muted-foreground">
+                  <span className="text-xs text-muted-foreground ml-auto sm:ml-0">
                     {formatDate(comment.timestamp)}
                   </span>
                 </div>
                 
-                <p className="text-foreground whitespace-pre-wrap">
+                <p className="text-sm sm:text-base text-foreground whitespace-pre-wrap break-words">
                   {comment.content}
                 </p>
               </div>

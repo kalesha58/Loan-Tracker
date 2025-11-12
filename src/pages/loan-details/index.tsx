@@ -263,36 +263,29 @@ const LoanDetailsPage = () => {
       <Header user={user} onLogout={handleLogout} />
       
       <main className="pt-16">
-        <div className="max-w-screen-2xl mx-auto px-6 py-6">
+        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
           {/* Breadcrumb */}
-          <Breadcrumb className="mb-6" />
+          <Breadcrumb className="mb-4 sm:mb-6" />
 
           {/* Page Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4 sm:mb-6">
             <div>
-              <h1 className="text-2xl font-semibold text-foreground">
+              <h1 className="text-xl sm:text-2xl font-semibold text-foreground">
                 Loan Details
               </h1>
-              <p className="text-muted-foreground">
+              <p className="text-sm sm:text-base text-muted-foreground mt-1">
                 Comprehensive loan management and workflow tracking
               </p>
             </div>
             
-            <div className="flex items-center gap-3">
-              <Button
-                variant="outline"
-                iconName="ArrowLeft"
-                iconPosition="left"
-                onClick={() => navigate('/loans-list')}>
-
-                Back to Loans
-              </Button>
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
               <Button
                 variant="default"
                 iconName="Edit"
                 iconPosition="left"
-                onClick={() => navigate(`/edit-loan?id=${loanId}`)}>
-
+                onClick={() => navigate(`/edit-loan?id=${loanId}`)}
+                className="w-full sm:w-auto"
+              >
                 Edit Loan
               </Button>
             </div>
@@ -305,23 +298,23 @@ const LoanDetailsPage = () => {
           <WorkflowTimeline steps={workflowSteps} />
 
           {/* Tabbed Content */}
-          <div className="bg-card border border-border rounded-lg">
+          <div className="bg-card border border-border rounded-lg overflow-hidden">
             {/* Tab Navigation */}
-            <div className="border-b border-border">
-              <nav className="flex space-x-8 px-6" aria-label="Tabs">
+            <div className="border-b border-border overflow-x-auto">
+              <nav className="flex space-x-4 sm:space-x-8 px-4 sm:px-6 min-w-max" aria-label="Tabs">
                 {tabSections.map((tab) =>
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                  className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${
                   activeTab === tab.id ?
                   'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'}`
                   }>
-
                     <Icon name={tab.icon} size={16} />
-                    <span>{tab.label}</span>
+                    <span className="hidden sm:inline">{tab.label}</span>
+                    <span className="sm:hidden">{tab.label.split(' ')[0]}</span>
                     {tab.count !== undefined &&
-                  <span className={`ml-2 px-2 py-1 text-xs rounded-full ${
+                  <span className={`ml-1 sm:ml-2 px-1.5 sm:px-2 py-0.5 sm:py-1 text-xs rounded-full ${
                   activeTab === tab.id ?
                   'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`
                   }>
@@ -334,7 +327,7 @@ const LoanDetailsPage = () => {
             </div>
 
             {/* Tab Content */}
-            <div className="p-6">
+            <div className="p-4 sm:p-6">
               {renderTabContent()}
             </div>
           </div>

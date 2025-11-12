@@ -222,16 +222,27 @@ const Dashboard = () => {
         <Header user={user} onLogout={handleLogout} />
         
         <main className="pt-16">
-          <div className="max-w-screen-2xl mx-auto px-6 py-8">
-            <div className="mb-6">
+          <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-10">
+            {/* Modern Header Section */}
+            <div className="mb-8">
               <Breadcrumb />
-              <div className="mt-4">
-                <h1 className="text-3xl font-semibold text-foreground">
-                  Dashboard
-                </h1>
-                <p className="text-muted-foreground mt-2">
-                  Welcome back, {user.name}. Here's your loan portfolio overview.
-                </p>
+              <div className="mt-6">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <div>
+                    <h1 className="text-4xl font-bold text-foreground tracking-tight">
+                      Dashboard
+                    </h1>
+                    <p className="text-muted-foreground mt-2 text-lg">
+                      Welcome back, <span className="font-semibold text-foreground">{user.name}</span>. Here's your loan portfolio overview.
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="hidden sm:block text-right">
+                      <div className="text-sm text-muted-foreground">Role</div>
+                      <div className="text-sm font-medium text-foreground">{user.role}</div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -245,19 +256,19 @@ const Dashboard = () => {
             <SummaryCards summaryData={loanSummaryData} />
 
             {/* Charts and Notifications Row */}
-            <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 mb-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
               {/* Loan Distribution Chart */}
-              <div className="xl:col-span-1">
+              <div className="lg:col-span-1">
                 <LoanDistributionChart data={chartData} />
               </div>
 
               {/* Trend Chart */}
-              <div className="xl:col-span-1">
+              <div className="lg:col-span-1 xl:col-span-1">
                 <TrendChart data={trendData} />
               </div>
 
               {/* Notifications Panel */}
-              <div className="xl:col-span-1">
+              <div className="lg:col-span-2 xl:col-span-1">
                 <NotificationsPanel
                   notifications={notifications}
                   onMarkAsRead={handleMarkAsRead}

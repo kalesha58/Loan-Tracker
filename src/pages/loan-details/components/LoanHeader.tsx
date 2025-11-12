@@ -56,38 +56,40 @@ const LoanHeader = ({ loan }: LoanHeaderProps) => {
   };
 
   return (
-    <div className="bg-card border border-border rounded-lg p-6 mb-6">
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+    <div className="bg-card border border-border rounded-lg p-4 sm:p-6 mb-4 sm:mb-6">
+      <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 sm:gap-6">
         {/* Left Section - Basic Info */}
-        <div className="flex-1">
-          <div className="flex items-center gap-4 mb-4">
-            <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
-              <Icon name={getLoanTypeIcon(loan.loanType)} size={24} className="text-primary" />
+        <div className="flex-1 min-w-0">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 mb-4">
+            <div className="flex items-center gap-3 sm:gap-4">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                <Icon name={getLoanTypeIcon(loan.loanType)} size={20} className="sm:w-6 sm:h-6 text-primary" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <h1 className="text-xl sm:text-2xl font-semibold text-foreground truncate">
+                  Loan #{loan.id}
+                </h1>
+                <p className="text-sm sm:text-base text-muted-foreground">
+                  {loan.loanType} Loan
+                </p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-2xl font-semibold text-foreground">
-                Loan #{loan.id}
-              </h1>
-              <p className="text-muted-foreground">
-                {loan.loanType} Loan
-              </p>
-            </div>
-            <div className={`px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(loan.status)}`}>
+            <div className={`px-2.5 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium border flex-shrink-0 ${getStatusColor(loan.status)}`}>
               {loan.status}
             </div>
           </div>
 
           {/* Borrower Info */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <p className="text-sm text-muted-foreground mb-1">Borrower</p>
-              <p className="font-medium text-foreground">{loan.borrowerName}</p>
-              <p className="text-sm text-muted-foreground">{loan.borrowerEmail}</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+            <div className="min-w-0">
+              <p className="text-xs sm:text-sm text-muted-foreground mb-1">Borrower</p>
+              <p className="font-medium text-sm sm:text-base text-foreground truncate">{loan.borrowerName}</p>
+              <p className="text-xs sm:text-sm text-muted-foreground truncate">{loan.borrowerEmail}</p>
             </div>
-            <div>
-              <p className="text-sm text-muted-foreground mb-1">Contact</p>
-              <p className="font-medium text-foreground">{loan.borrowerPhone}</p>
-              <p className="text-sm text-muted-foreground">
+            <div className="min-w-0">
+              <p className="text-xs sm:text-sm text-muted-foreground mb-1">Contact</p>
+              <p className="font-medium text-sm sm:text-base text-foreground">{loan.borrowerPhone}</p>
+              <p className="text-xs sm:text-sm text-muted-foreground">
                 Applied: {formatDate(loan.applicationDate)}
               </p>
             </div>
@@ -95,38 +97,38 @@ const LoanHeader = ({ loan }: LoanHeaderProps) => {
         </div>
 
         {/* Right Section - Financial Details */}
-        <div className="lg:w-80">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="text-center p-4 bg-muted/50 rounded-lg">
-              <p className="text-sm text-muted-foreground mb-1">Loan Amount</p>
-              <p className="text-xl font-semibold text-foreground">
+        <div className="w-full lg:w-80">
+          <div className="grid grid-cols-2 gap-2 sm:gap-4">
+            <div className="text-center p-3 sm:p-4 bg-muted/50 rounded-lg">
+              <p className="text-xs sm:text-sm text-muted-foreground mb-1">Loan Amount</p>
+              <p className="text-base sm:text-xl font-semibold text-foreground break-words">
                 {formatCurrency(loan.amount)}
               </p>
             </div>
-            <div className="text-center p-4 bg-muted/50 rounded-lg">
-              <p className="text-sm text-muted-foreground mb-1">Monthly EMI</p>
-              <p className="text-xl font-semibold text-foreground">
+            <div className="text-center p-3 sm:p-4 bg-muted/50 rounded-lg">
+              <p className="text-xs sm:text-sm text-muted-foreground mb-1">Monthly EMI</p>
+              <p className="text-base sm:text-xl font-semibold text-foreground break-words">
                 {formatCurrency(loan.monthlyEMI)}
               </p>
             </div>
-            <div className="text-center p-4 bg-muted/50 rounded-lg">
-              <p className="text-sm text-muted-foreground mb-1">Interest Rate</p>
-              <p className="text-lg font-semibold text-foreground">
+            <div className="text-center p-3 sm:p-4 bg-muted/50 rounded-lg">
+              <p className="text-xs sm:text-sm text-muted-foreground mb-1">Interest Rate</p>
+              <p className="text-sm sm:text-lg font-semibold text-foreground">
                 {loan.interestRate}% p.a.
               </p>
             </div>
-            <div className="text-center p-4 bg-muted/50 rounded-lg">
-              <p className="text-sm text-muted-foreground mb-1">Term</p>
-              <p className="text-lg font-semibold text-foreground">
+            <div className="text-center p-3 sm:p-4 bg-muted/50 rounded-lg">
+              <p className="text-xs sm:text-sm text-muted-foreground mb-1">Term</p>
+              <p className="text-sm sm:text-lg font-semibold text-foreground">
                 {loan.term} months
               </p>
             </div>
           </div>
           {loan.nextDueDate && (
-            <div className="mt-4 p-3 bg-warning/10 border border-warning/20 rounded-lg">
+            <div className="mt-3 sm:mt-4 p-2.5 sm:p-3 bg-warning/10 border border-warning/20 rounded-lg">
               <div className="flex items-center gap-2">
-                <Icon name="Calendar" size={16} className="text-warning" />
-                <span className="text-sm font-medium text-warning-foreground">
+                <Icon name="Calendar" size={14} className="sm:w-4 sm:h-4 text-warning flex-shrink-0" />
+                <span className="text-xs sm:text-sm font-medium text-warning-foreground truncate">
                   Next Due: {formatDate(loan.nextDueDate)}
                 </span>
               </div>

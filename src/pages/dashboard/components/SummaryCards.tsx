@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { useNavigate } from 'react-router-dom';
 import Icon from '../../../components/ui/AppIcon';
 import { LoanSummary } from '../types';
 
@@ -8,6 +9,13 @@ interface SummaryCardsProps {
 }
 
 const SummaryCards = ({ summaryData }: SummaryCardsProps) => {
+  const navigate = useNavigate();
+
+  const handleCardClick = (loanType: string) => {
+    if (loanType === 'Personal') {
+      navigate('/personal-loans');
+    }
+  };
   const formatCurrency = (amount: number): string => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
@@ -18,38 +26,54 @@ const SummaryCards = ({ summaryData }: SummaryCardsProps) => {
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
       {summaryData.map((item, index) => (
         <div
           key={index}
-          className="bg-card rounded-lg border border-border p-6 shadow-card hover:shadow-modal transition-smooth"
+          onClick={() => handleCardClick(item.type)}
+          className={`group relative bg-card rounded-xl border border-border/50 p-6 shadow-sm hover:shadow-lg hover:border-border transition-all duration-300 overflow-hidden ${
+            item.type === 'Personal' ? 'cursor-pointer' : ''
+          }`}
         >
-          <div className="flex items-center justify-between mb-4">
-            <div
-              className="w-12 h-12 rounded-lg flex items-center justify-center"
-              style={{ backgroundColor: `${item.color}15` }}
-            >
-              <Icon
-                name={item.icon}
-                size={24}
-                color={item.color}
-              />
-            </div>
-            <div className="text-right">
-              <div className="text-2xl font-semibold text-foreground">
-                {item.count}
+          {/* Subtle gradient overlay on hover */}
+          <div 
+            className="absolute inset-0 opacity-0 group-hover:opacity-5 transition-opacity duration-300"
+            style={{ 
+              background: `linear-gradient(135deg, ${item.color} 0%, transparent 100%)`
+            }}
+          />
+          
+          <div className="relative">
+            <div className="flex items-start justify-between mb-5">
+              <div
+                className="w-14 h-14 rounded-xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-300"
+                style={{ 
+                  backgroundColor: `${item.color}15`,
+                  border: `1px solid ${item.color}20`
+                }}
+              >
+                <Icon
+                  name={item.icon}
+                  size={26}
+                  color={item.color}
+                />
               </div>
-              <div className="text-sm text-muted-foreground">
-                Loans
+              <div className="text-right">
+                <div className="text-3xl font-bold text-foreground">
+                  {item.count}
+                </div>
+                <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                  Loans
+                </div>
               </div>
             </div>
-          </div>
-          <div className="space-y-2">
-            <h3 className="text-sm font-medium text-muted-foreground">
-              {item.type} Loans
-            </h3>
-            <div className="text-lg font-semibold text-foreground">
-              {formatCurrency(item.totalAmount)}
+            <div className="space-y-1">
+              <h3 className="text-sm font-medium text-muted-foreground">
+                {item.type} Loans
+              </h3>
+              <div className="text-xl font-bold text-foreground">
+                {formatCurrency(item.totalAmount)}
+              </div>
             </div>
           </div>
         </div>

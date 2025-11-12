@@ -37,11 +37,16 @@ const TrendChart = ({ data }: TrendChartProps) => {
   };
 
   return (
-    <div className="bg-card rounded-lg border border-border p-6 shadow-card">
+    <div className="bg-card rounded-xl border border-border/50 p-6 shadow-sm">
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-semibold text-foreground">
-          Monthly Repayment Trends
-        </h3>
+        <div>
+          <h3 className="text-lg font-bold text-foreground">
+            Monthly Repayment Trends
+          </h3>
+          <p className="text-sm text-muted-foreground mt-1">
+            Track repayment performance over time
+          </p>
+        </div>
         <div className="flex items-center space-x-2">
           <Button
             variant={chartType === 'line' ? 'default' : 'outline'}
