@@ -23,6 +23,7 @@ const LoginForm = ({ onSubmit, isLoading, error }: LoginFormProps) => {
   });
 
   const [errors, setErrors] = useState<LoginFormErrors>({});
+  const [showPassword, setShowPassword] = useState(false);
 
   const validateForm = (): boolean => {
     const newErrors: LoginFormErrors = {};
@@ -53,7 +54,7 @@ const LoginForm = ({ onSubmit, isLoading, error }: LoginFormProps) => {
     try {
       await onSubmit(formData);
     } catch (err) {
-      console.error('Login failed:', err);
+      // Error is handled by parent component
     }
   };
 
@@ -71,32 +72,64 @@ const LoginForm = ({ onSubmit, isLoading, error }: LoginFormProps) => {
 
   return (
     <div className="w-full max-w-md mx-auto">
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-4">
         {/* Email Input */}
-        <Input
-          label="Email Address"
-          type="email"
-          placeholder="Enter your email"
-          value={formData.email}
-          onChange={handleInputChange('email')}
-          error={errors.email}
-          required
-          disabled={isLoading}
-          className="w-full"
-        />
+        <div className="space-y-1.5">
+          <Input
+            label="Email Address"
+            type="email"
+            placeholder="Enter your email"
+            value={formData.email}
+            onChange={handleInputChange('email')}
+            error={errors.email}
+            required
+            disabled={isLoading}
+            className="w-full transition-all duration-200 focus:ring-2 focus:ring-primary/20 dark:focus:ring-primary/30"
+          />
+        </div>
 
         {/* Password Input */}
-        <Input
-          label="Password"
-          type="password"
-          placeholder="Enter your password"
-          value={formData.password}
-          onChange={handleInputChange('password')}
-          error={errors.password}
-          required
-          disabled={isLoading}
-          className="w-full"
-        />
+        <div className="space-y-1.5">
+          <div className="relative">
+            <label
+              htmlFor="password-input"
+              className={`text-sm font-medium leading-none block mb-2 ${
+                errors.password ? "text-destructive" : "text-foreground"
+              }`}
+            >
+              Password
+              <span className="text-destructive ml-1">*</span>
+            </label>
+            <div className="relative">
+              <Input
+                id="password-input"
+                label=""
+                type={showPassword ? "text" : "password"}
+                placeholder="Enter your password"
+                value={formData.password}
+                onChange={handleInputChange('password')}
+                error={errors.password}
+                required
+                disabled={isLoading}
+                className="w-full pr-10 transition-all duration-200 focus:ring-2 focus:ring-primary/20 dark:focus:ring-primary/30"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-[20px] text-muted-foreground hover:text-foreground dark:text-slate-400 dark:hover:text-slate-300 transition-colors focus:outline-none disabled:opacity-50 z-10"
+                tabIndex={-1}
+                disabled={isLoading}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                <Icon 
+                  name={showPassword ? "EyeOff" : "Eye"} 
+                  size={18} 
+                  className="text-muted-foreground dark:text-slate-400"
+                />
+              </button>
+            </div>
+          </div>
+        </div>
 
         {/* Remember Me Checkbox */}
         <div className="flex items-center justify-between">
@@ -110,7 +143,7 @@ const LoginForm = ({ onSubmit, isLoading, error }: LoginFormProps) => {
           <button
             type="button"
             onClick={() => navigate('/forgot-password')}
-            className="text-sm text-primary hover:text-primary/80 transition-hover"
+            className="text-sm font-medium text-primary hover:text-primary/80 dark:text-blue-400 dark:hover:text-blue-300 transition-all duration-200 hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={isLoading}
           >
             Forgot Password?
@@ -119,9 +152,9 @@ const LoginForm = ({ onSubmit, isLoading, error }: LoginFormProps) => {
 
         {/* General Error Message */}
         {error && (
-          <div className="flex items-center space-x-2 p-3 bg-destructive/10 border border-destructive/20 rounded-md">
-            <Icon name="AlertCircle" size={16} className="text-destructive flex-shrink-0" />
-            <p className="text-sm text-destructive">{error}</p>
+          <div className="flex items-start space-x-2 p-3 bg-destructive/10 dark:bg-destructive/20 border border-destructive/30 dark:border-destructive/40 rounded-lg animate-shake">
+            <Icon name="AlertCircle" size={16} className="text-destructive dark:text-red-400 flex-shrink-0 mt-0.5" />
+            <p className="text-sm text-destructive dark:text-red-400 leading-relaxed">{error}</p>
           </div>
         )}
 
@@ -135,18 +168,19 @@ const LoginForm = ({ onSubmit, isLoading, error }: LoginFormProps) => {
           disabled={isLoading}
           iconName="LogIn"
           iconPosition="right"
+          className="h-11 text-base font-semibold shadow-lg shadow-primary/25 dark:shadow-primary/40 hover:shadow-xl hover:shadow-primary/30 dark:hover:shadow-primary/50 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
         >
           {isLoading ? 'Signing In...' : 'Sign In'}
         </Button>
 
         {/* Create Account Link */}
-        <div className="text-center">
-          <p className="text-sm text-muted-foreground">
+        <div className="text-center pt-2">
+          <p className="text-sm text-muted-foreground dark:text-slate-400">
             Don't have an account?{' '}
             <button
               type="button"
               onClick={() => navigate('/register')}
-              className="text-primary hover:text-primary/80 font-medium transition-hover"
+              className="text-primary dark:text-blue-400 hover:text-primary/80 dark:hover:text-blue-300 font-semibold transition-all duration-200 hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={isLoading}
             >
               Create Account
@@ -154,6 +188,24 @@ const LoginForm = ({ onSubmit, isLoading, error }: LoginFormProps) => {
           </p>
         </div>
       </form>
+
+      <style>{`
+        @keyframes shake {
+          0%, 100% {
+            transform: translateX(0);
+          }
+          10%, 30%, 50%, 70%, 90% {
+            transform: translateX(-4px);
+          }
+          20%, 40%, 60%, 80% {
+            transform: translateX(4px);
+          }
+        }
+        
+        .animate-shake {
+          animation: shake 0.5s ease-in-out;
+        }
+      `}</style>
     </div>
   );
 };

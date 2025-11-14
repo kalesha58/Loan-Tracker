@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import { useLocation, useNavigate } from 'react-router-dom';
 import Icon from './AppIcon';
@@ -10,16 +10,73 @@ interface User {
   role: string;
 }
 
+interface Notification {
+  id: string;
+  title: string;
+  message: string;
+  type: 'success' | 'warning' | 'error' | 'info';
+  timestamp: Date;
+  isRead: boolean;
+}
+
 interface HeaderProps {
   user?: User;
   onLogout?: () => void;
+  notifications?: Notification[];
+  onMarkNotificationAsRead?: (id: string) => void;
+  onMarkAllNotificationsAsRead?: () => void;
 }
 
-const Header = ({ user, onLogout }: HeaderProps) => {
+const Header = ({ 
+  user, 
+  onLogout, 
+  notifications = [], 
+  onMarkNotificationAsRead,
+  onMarkAllNotificationsAsRead 
+}: HeaderProps) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
+  const [isNotificationDropdownOpen, setIsNotificationDropdownOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+
+  // Mock notifications if not provided
+  const [mockNotifications, setMockNotifications] = useState<Notification[]>([]);
+  
+  useEffect(() => {
+    if (notifications.length === 0) {
+      const mock: Notification[] = [
+        {
+          id: "1",
+          title: "Document Verification Complete",
+          message: "Loan application LN001 documents have been successfully verified and approved.",
+          type: "success",
+          timestamp: new Date(Date.now() - 300000),
+          isRead: false
+        },
+        {
+          id: "2",
+          title: "Payment Due Reminder",
+          message: "Loan LN002 payment of ₹45,000 is due in 3 days. Please remind the borrower.",
+          type: "warning",
+          timestamp: new Date(Date.now() - 900000),
+          isRead: false
+        },
+        {
+          id: "3",
+          title: "New Loan Application",
+          message: "A new business loan application for ₹15,00,000 has been submitted by Rajesh Industries.",
+          type: "info",
+          timestamp: new Date(Date.now() - 1800000),
+          isRead: true
+        }
+      ];
+      setMockNotifications(mock);
+    }
+  }, [notifications.length]);
+
+  const displayNotifications = notifications.length > 0 ? notifications : mockNotifications;
+  const unreadCount = displayNotifications.filter(n => !n.isRead).length;
 
   const navigationItems = [
     {
@@ -51,6 +108,68 @@ const Header = ({ user, onLogout }: HeaderProps) => {
   const handleLogout = () => {
     setIsUserDropdownOpen(false);
     onLogout?.();
+  };
+
+  const handleMarkAsRead = (id: string) => {
+    if (onMarkNotificationAsRead) {
+      onMarkNotificationAsRead(id);
+    } else {
+      setMockNotifications(prev =>
+        prev.map(notification =>
+          notification.id === id
+            ? { ...notification, isRead: true }
+            : notification
+        )
+      );
+    }
+  };
+
+  const handleMarkAllAsRead = () => {
+    if (onMarkAllNotificationsAsRead) {
+      onMarkAllNotificationsAsRead();
+    } else {
+      setMockNotifications(prev =>
+        prev.map(notification => ({ ...notification, isRead: true }))
+      );
+    }
+  };
+
+  const getNotificationIcon = (type: string) => {
+    switch (type) {
+      case 'success':
+        return 'CheckCircle';
+      case 'warning':
+        return 'AlertTriangle';
+      case 'error':
+        return 'XCircle';
+      default:
+        return 'Info';
+    }
+  };
+
+  const getNotificationColor = (type: string) => {
+    switch (type) {
+      case 'success':
+        return 'text-success';
+      case 'warning':
+        return 'text-warning';
+      case 'error':
+        return 'text-destructive';
+      default:
+        return 'text-primary';
+    }
+  };
+
+  const formatTime = (date: Date): string => {
+    const now = new Date();
+    const diff = now.getTime() - date.getTime();
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
+
+    if (minutes < 60) return `${minutes}m ago`;
+    if (hours < 24) return `${hours}h ago`;
+    return `${days}d ago`;
   };
 
   if (location.pathname === '/login') {
@@ -95,7 +214,111 @@ const Header = ({ user, onLogout }: HeaderProps) => {
           </nav>
 
           {/* User Account & Mobile Menu */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-3">
+            {/* Notifications Bell Icon */}
+            {user && (
+              <div className="relative">
+                <button
+                  onClick={() => {
+                    setIsNotificationDropdownOpen(!isNotificationDropdownOpen);
+                    setIsUserDropdownOpen(false);
+                  }}
+                  className="relative p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-hover"
+                  aria-label="Notifications"
+                >
+                  <Icon name="Bell" size={20} />
+                  {unreadCount > 0 && (
+                    <span className="absolute top-0 right-0 w-5 h-5 bg-destructive text-destructive-foreground text-xs font-bold rounded-full flex items-center justify-center">
+                      {unreadCount > 9 ? '9+' : unreadCount}
+                    </span>
+                  )}
+                </button>
+
+                {/* Notifications Dropdown */}
+                {isNotificationDropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-80 md:w-96 bg-popover border border-border rounded-lg shadow-xl z-1002 max-h-[500px] flex flex-col">
+                    {/* Header */}
+                    <div className="p-4 border-b border-border flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-lg font-semibold text-foreground">
+                          Notifications
+                        </h3>
+                        {unreadCount > 0 && (
+                          <span className="bg-primary text-primary-foreground text-xs font-bold px-2 py-0.5 rounded-full">
+                            {unreadCount}
+                          </span>
+                        )}
+                      </div>
+                      {unreadCount > 0 && (
+                        <button
+                          onClick={handleMarkAllAsRead}
+                          className="text-xs text-primary hover:text-primary/80 font-medium transition-colors"
+                        >
+                          Mark all read
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Notifications List */}
+                    <div className="overflow-y-auto max-h-[400px]">
+                      {displayNotifications.length === 0 ? (
+                        <div className="p-8 text-center">
+                          <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mx-auto mb-3">
+                            <Icon name="Bell" size={24} className="text-muted-foreground" />
+                          </div>
+                          <p className="text-sm text-muted-foreground font-medium">No notifications</p>
+                          <p className="text-xs text-muted-foreground mt-1">You're all caught up!</p>
+                        </div>
+                      ) : (
+                        <div className="divide-y divide-border">
+                          {displayNotifications.map((notification) => (
+                            <div
+                              key={notification.id}
+                              onClick={() => handleMarkAsRead(notification.id)}
+                              className={`p-4 hover:bg-muted/50 transition-colors cursor-pointer ${
+                                !notification.isRead ? 'bg-primary/5' : ''
+                              }`}
+                            >
+                              <div className="flex items-start gap-3">
+                                <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                                  notification.type === 'success' ? 'bg-success/10' :
+                                  notification.type === 'warning' ? 'bg-warning/10' :
+                                  notification.type === 'error' ? 'bg-destructive/10' :
+                                  'bg-primary/10'
+                                }`}>
+                                  <Icon
+                                    name={getNotificationIcon(notification.type)}
+                                    size={16}
+                                    className={getNotificationColor(notification.type)}
+                                  />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-start justify-between gap-2 mb-1">
+                                    <h4 className="text-sm font-semibold text-foreground">
+                                      {notification.title}
+                                    </h4>
+                                    {!notification.isRead && (
+                                      <div className="w-2 h-2 bg-primary rounded-full flex-shrink-0 mt-1" />
+                                    )}
+                                  </div>
+                                  <p className="text-xs text-muted-foreground line-clamp-2 mb-1">
+                                    {notification.message}
+                                  </p>
+                                  <span className="text-xs text-muted-foreground">
+                                    {formatTime(notification.timestamp)}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* User Dropdown */}
             {user && (
               <div className="relative">
@@ -202,6 +425,14 @@ const Header = ({ user, onLogout }: HeaderProps) => {
         <div
           className="fixed inset-0 z-1001"
           onClick={() => setIsUserDropdownOpen(false)}
+        />
+      )}
+
+      {/* Backdrop for notification dropdown */}
+      {isNotificationDropdownOpen && (
+        <div
+          className="fixed inset-0 z-1001"
+          onClick={() => setIsNotificationDropdownOpen(false)}
         />
       )}
     </header>

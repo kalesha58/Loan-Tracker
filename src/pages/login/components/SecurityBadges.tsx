@@ -26,23 +26,25 @@ const SecurityBadges = () => {
   ];
 
   return (
-    <div className="mt-8 pt-6 border-t border-border">
-      <div className="flex items-center justify-center space-x-6">
+    <div className="mt-4 pt-4 border-t border-border/50 dark:border-slate-700/50">
+      <div className="flex items-center justify-center gap-3">
         {securityBadges.map((badge) => (
           <div
             key={badge.id}
-            className="flex items-center space-x-2 text-muted-foreground"
+            className="flex items-center space-x-1.5"
             title={badge.description}
           >
-            <Icon name={badge.icon} size={16} className="text-success" />
-            <span className="text-xs font-medium">{badge.name}</span>
+            <Icon 
+              name={badge.icon as any} 
+              size={14} 
+              className="text-success dark:text-emerald-400" 
+            />
+            <span className="text-[10px] font-medium text-muted-foreground dark:text-slate-400">
+              {badge.name}
+            </span>
           </div>
         ))}
       </div>
-      
-      <p className="text-center text-xs text-muted-foreground mt-3">
-        Your financial data is protected with enterprise-grade security
-      </p>
     </div>
   );
 };

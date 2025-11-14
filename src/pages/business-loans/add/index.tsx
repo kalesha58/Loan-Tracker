@@ -9,12 +9,12 @@ import Input from '../../../components/ui/Input';
 import Button from '../../../components/ui/Button';
 import Select from '../../../components/ui/Select';
 import Icon from '../../../components/ui/AppIcon';
-import { IPersonalLoanFormData, IOTPVerificationState, IFileUploadState } from '../types';
+import { IBusinessLoanFormData, IOTPVerificationState, IFileUploadState } from '../types';
 import { Loan } from '../../loans-list/types';
 import { generateLoanPDF } from '../../../utils/pdfGenerator';
 import { handleLogout as logout } from '../../../utils/auth';
 
-const AddPersonalLoanPage = () => {
+const AddBusinessLoanPage = () => {
   const navigate = useNavigate();
   const [otpState, setOtpState] = useState<IOTPVerificationState>({
     otpSent: false,
@@ -24,10 +24,12 @@ const AddPersonalLoanPage = () => {
   });
 
   const [fileUploads, setFileUploads] = useState<IFileUploadState>({
-    aadhaarCard: null,
-    panCard: null,
-    aadhaarFileName: '',
-    panFileName: ''
+    businessRegistrationDoc: null,
+    gstCertificate: null,
+    bankStatement: null,
+    businessRegistrationFileName: '',
+    gstCertificateFileName: '',
+    bankStatementFileName: ''
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -46,12 +48,16 @@ const AddPersonalLoanPage = () => {
     formState: { errors },
     reset,
     watch
-  } = useForm<IPersonalLoanFormData>({
+  } = useForm<IBusinessLoanFormData>({
     defaultValues: {
-      borrowerName: '',
+      businessName: '',
+      contactPersonName: '',
       phoneNumber: '',
       email: '',
-      address: '',
+      businessAddress: '',
+      businessType: '',
+      registrationNumber: '',
+      gstNumber: '',
       loanAmount: 0,
       interestRate: 0,
       tenure: 0,
@@ -99,7 +105,10 @@ const AddPersonalLoanPage = () => {
     }, 1000);
   };
 
-  const handleAadhaarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    fileType: 'businessRegistrationDoc' | 'gstCertificate' | 'bankStatement'
+  ) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -116,50 +125,30 @@ const AddPersonalLoanPage = () => {
       return;
     }
 
+    const fileNameKey = fileType === 'businessRegistrationDoc' 
+      ? 'businessRegistrationFileName'
+      : fileType === 'gstCertificate'
+      ? 'gstCertificateFileName'
+      : 'bankStatementFileName';
+
     setFileUploads(prev => ({
       ...prev,
-      aadhaarCard: file,
-      aadhaarFileName: file.name
+      [fileType]: file,
+      [fileNameKey]: file.name
     }));
   };
 
-  const handlePANUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
-    const maxSize = 10 * 1024 * 1024; // 10MB
-
-    if (!allowedTypes.includes(file.type)) {
-      alert('Invalid file type. Please upload PDF, JPG, or PNG files.');
-      return;
-    }
-
-    if (file.size > maxSize) {
-      alert('File too large. Maximum size is 10MB.');
-      return;
-    }
+  const removeFile = (fileType: 'businessRegistrationDoc' | 'gstCertificate' | 'bankStatement') => {
+    const fileNameKey = fileType === 'businessRegistrationDoc' 
+      ? 'businessRegistrationFileName'
+      : fileType === 'gstCertificate'
+      ? 'gstCertificateFileName'
+      : 'bankStatementFileName';
 
     setFileUploads(prev => ({
       ...prev,
-      panCard: file,
-      panFileName: file.name
-    }));
-  };
-
-  const removeAadhaarFile = () => {
-    setFileUploads(prev => ({
-      ...prev,
-      aadhaarCard: null,
-      aadhaarFileName: ''
-    }));
-  };
-
-  const removePANFile = () => {
-    setFileUploads(prev => ({
-      ...prev,
-      panCard: null,
-      panFileName: ''
+      [fileType]: null,
+      [fileNameKey]: ''
     }));
   };
 
@@ -179,14 +168,14 @@ const AddPersonalLoanPage = () => {
     return date.toISOString().split('T')[0];
   };
 
-  const onSubmit = async (data: IPersonalLoanFormData) => {
+  const onSubmit = async (data: IBusinessLoanFormData) => {
     if (!otpState.otpVerified) {
       alert('Please verify your phone number with OTP');
       return;
     }
 
-    if (!fileUploads.aadhaarCard || !fileUploads.panCard) {
-      alert('Please upload both Aadhaar Card and PAN Card');
+    if (!fileUploads.businessRegistrationDoc || !fileUploads.gstCertificate || !fileUploads.bankStatement) {
+      alert('Please upload all required documents');
       return;
     }
 
@@ -201,11 +190,11 @@ const AddPersonalLoanPage = () => {
       // Create loan object
       const newLoan: Loan = {
         id: loanId,
-        borrowerName: data.borrowerName,
+        borrowerName: data.businessName,
         borrowerEmail: data.email,
         borrowerPhone: data.phoneNumber,
-        borrowerAddress: data.address,
-        loanType: 'Personal',
+        borrowerAddress: data.businessAddress,
+        loanType: 'Business',
         amount: data.loanAmount,
         status: 'Initiated',
         nextDueDate: nextDueDate,
@@ -215,15 +204,15 @@ const AddPersonalLoanPage = () => {
       };
 
       // Save to localStorage
-      const existingLoans = localStorage.getItem('personalLoans');
+      const existingLoans = localStorage.getItem('businessLoans');
       const loans: Loan[] = existingLoans ? JSON.parse(existingLoans) : [];
       loans.push(newLoan);
-      localStorage.setItem('personalLoans', JSON.stringify(loans));
+      localStorage.setItem('businessLoans', JSON.stringify(loans));
 
       // Generate and download PDF
       generateLoanPDF({
         loan: newLoan,
-        formData: data
+        formData: data as any
       });
 
       // Reset form
@@ -235,14 +224,16 @@ const AddPersonalLoanPage = () => {
         isVerifying: false
       });
       setFileUploads({
-        aadhaarCard: null,
-        panCard: null,
-        aadhaarFileName: '',
-        panFileName: ''
+        businessRegistrationDoc: null,
+        gstCertificate: null,
+        bankStatement: null,
+        businessRegistrationFileName: '',
+        gstCertificateFileName: '',
+        bankStatementFileName: ''
       });
 
-      alert('Personal loan application submitted successfully! PDF has been downloaded.');
-      navigate('/personal-loans');
+      alert('Business loan application submitted successfully! PDF has been downloaded.');
+      navigate('/loans-list');
     } catch (error) {
       alert('An error occurred while submitting the loan. Please try again.');
     } finally {
@@ -259,11 +250,20 @@ const AddPersonalLoanPage = () => {
     { value: 'years', label: 'Years' }
   ];
 
+  const businessTypeOptions = [
+    { value: 'sole_proprietorship', label: 'Sole Proprietorship' },
+    { value: 'partnership', label: 'Partnership' },
+    { value: 'llp', label: 'Limited Liability Partnership (LLP)' },
+    { value: 'private_limited', label: 'Private Limited Company' },
+    { value: 'public_limited', label: 'Public Limited Company' },
+    { value: 'other', label: 'Other' }
+  ];
+
   return (
     <>
       <Helmet>
-        <title>Add Personal Loan - LoanTracker</title>
-        <meta name="description" content="Add a new personal loan application" />
+        <title>Add Business Loan - LoanTracker</title>
+        <meta name="description" content="Add a new business loan application" />
       </Helmet>
 
       <div className="min-h-screen bg-background">
@@ -277,17 +277,17 @@ const AddPersonalLoanPage = () => {
               <div className="mt-4 flex items-center justify-between">
                 <div>
                   <h1 className="text-3xl font-semibold text-foreground">
-                    Add Personal Loan
+                    Add Business Loan
                   </h1>
                   <p className="text-muted-foreground mt-2">
-                    Fill in the details to create a new personal loan application
+                    Fill in the details to create a new business loan application
                   </p>
                 </div>
                 <Button
                   variant="outline"
                   iconName="ArrowLeft"
                   iconPosition="left"
-                  onClick={() => navigate('/personal-loans')}
+                  onClick={() => navigate('/loans-list')}
                 >
                   Back to List
                 </Button>
@@ -297,27 +297,43 @@ const AddPersonalLoanPage = () => {
             {/* Form Card */}
             <div className="bg-card rounded-xl border border-border/50 shadow-sm">
               <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-8">
-                {/* Borrower Information Section */}
+                {/* Business Information Section */}
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold text-foreground border-b border-border pb-2">
-                    Borrower Information
+                    Business Information
                   </h3>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <Input
-                      label="Borrower Name"
+                      label="Business Name"
                       required
-                      {...register('borrowerName', {
-                        required: 'Borrower name is required',
+                      {...register('businessName', {
+                        required: 'Business name is required',
+                        minLength: {
+                          value: 2,
+                          message: 'Business name must be at least 2 characters'
+                        }
+                      })}
+                      error={errors.businessName?.message}
+                      placeholder="Enter business name"
+                    />
+
+                    <Input
+                      label="Contact Person Name"
+                      required
+                      {...register('contactPersonName', {
+                        required: 'Contact person name is required',
                         minLength: {
                           value: 2,
                           message: 'Name must be at least 2 characters'
                         }
                       })}
-                      error={errors.borrowerName?.message}
-                      placeholder="Enter borrower name"
+                      error={errors.contactPersonName?.message}
+                      placeholder="Enter contact person name"
                     />
+                  </div>
 
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <Input
                       label="Phone Number"
                       type="tel"
@@ -331,6 +347,21 @@ const AddPersonalLoanPage = () => {
                       })}
                       error={errors.phoneNumber?.message}
                       placeholder="Enter 10-digit phone number"
+                    />
+
+                    <Input
+                      label="Email"
+                      type="email"
+                      required
+                      {...register('email', {
+                        required: 'Email is required',
+                        pattern: {
+                          value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                          message: 'Please enter a valid email address'
+                        }
+                      })}
+                      error={errors.email?.message}
+                      placeholder="Enter email address"
                     />
                   </div>
 
@@ -377,42 +408,69 @@ const AddPersonalLoanPage = () => {
                     )}
                   </div>
 
-                  <Input
-                    label="Email"
-                    type="email"
-                    required
-                    {...register('email', {
-                      required: 'Email is required',
-                      pattern: {
-                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                        message: 'Please enter a valid email address'
-                      }
-                    })}
-                    error={errors.email?.message}
-                    placeholder="Enter email address"
-                  />
-
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-2">
-                      Address <span className="text-destructive">*</span>
+                      Business Address <span className="text-destructive">*</span>
                     </label>
                     <textarea
-                      {...register('address', {
-                        required: 'Address is required',
+                      {...register('businessAddress', {
+                        required: 'Business address is required',
                         minLength: {
                           value: 10,
                           message: 'Address must be at least 10 characters'
                         }
                       })}
                       className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                      placeholder="Enter complete address"
+                      placeholder="Enter complete business address"
                     />
-                    {errors.address && (
+                    {errors.businessAddress && (
                       <p className="text-sm text-destructive mt-1">
-                        {errors.address.message}
+                        {errors.businessAddress.message}
                       </p>
                     )}
                   </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Controller
+                      name="businessType"
+                      control={control}
+                      rules={{ required: 'Business type is required' }}
+                      render={({ field }) => (
+                        <Select
+                          label="Business Type"
+                          required
+                          options={businessTypeOptions}
+                          value={field.value}
+                          onChange={field.onChange}
+                          error={errors.businessType?.message}
+                        />
+                      )}
+                    />
+
+                    <Input
+                      label="Registration Number"
+                      required
+                      {...register('registrationNumber', {
+                        required: 'Registration number is required'
+                      })}
+                      error={errors.registrationNumber?.message}
+                      placeholder="Enter business registration number"
+                    />
+                  </div>
+
+                  <Input
+                    label="GST Number"
+                    required
+                    {...register('gstNumber', {
+                      required: 'GST number is required',
+                      pattern: {
+                        value: /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/,
+                        message: 'Please enter a valid GST number'
+                      }
+                    })}
+                    error={errors.gstNumber?.message}
+                    placeholder="Enter 15-digit GST number"
+                  />
                 </div>
 
                 {/* Loan Details Section */}
@@ -429,8 +487,8 @@ const AddPersonalLoanPage = () => {
                       {...register('loanAmount', {
                         required: 'Loan amount is required',
                         min: {
-                          value: 10000,
-                          message: 'Minimum loan amount is ₹10,000'
+                          value: 100000,
+                          message: 'Minimum loan amount is ₹1,00,000'
                         },
                         valueAsNumber: true
                       })}
@@ -502,22 +560,22 @@ const AddPersonalLoanPage = () => {
                   </h3>
 
                   <div className="space-y-4">
-                    {/* Aadhaar Card Upload */}
+                    {/* Business Registration Document */}
                     <div>
                       <label className="block text-sm font-medium text-foreground mb-2">
-                        Aadhaar Card <span className="text-destructive">*</span>
+                        Business Registration Document <span className="text-destructive">*</span>
                       </label>
-                      {fileUploads.aadhaarFileName ? (
+                      {fileUploads.businessRegistrationFileName ? (
                         <div className="flex items-center justify-between p-3 border border-border rounded-md bg-muted/30">
                           <div className="flex items-center gap-2">
                             <Icon name="FileText" size={20} className="text-primary" />
-                            <span className="text-sm text-foreground">{fileUploads.aadhaarFileName}</span>
+                            <span className="text-sm text-foreground">{fileUploads.businessRegistrationFileName}</span>
                           </div>
                           <Button
                             type="button"
                             variant="ghost"
                             size="sm"
-                            onClick={removeAadhaarFile}
+                            onClick={() => removeFile('businessRegistrationDoc')}
                             iconName="X"
                           >
                             Remove
@@ -528,38 +586,38 @@ const AddPersonalLoanPage = () => {
                           <input
                             type="file"
                             accept=".pdf,.jpg,.jpeg,.png"
-                            onChange={handleAadhaarUpload}
+                            onChange={(e) => handleFileUpload(e, 'businessRegistrationDoc')}
                             className="hidden"
-                            id="aadhaar-upload"
+                            id="business-registration-upload"
                           />
                           <label
-                            htmlFor="aadhaar-upload"
+                            htmlFor="business-registration-upload"
                             className="flex flex-col items-center justify-center cursor-pointer"
                           >
                             <Icon name="Upload" size={32} className="text-muted-foreground mb-2" />
-                            <span className="text-sm text-foreground mb-1">Click to upload Aadhaar Card</span>
+                            <span className="text-sm text-foreground mb-1">Click to upload Business Registration Document</span>
                             <span className="text-xs text-muted-foreground">PDF, JPG, PNG (Max 10MB)</span>
                           </label>
                         </div>
                       )}
                     </div>
 
-                    {/* PAN Card Upload */}
+                    {/* GST Certificate */}
                     <div>
                       <label className="block text-sm font-medium text-foreground mb-2">
-                        PAN Card <span className="text-destructive">*</span>
+                        GST Certificate <span className="text-destructive">*</span>
                       </label>
-                      {fileUploads.panFileName ? (
+                      {fileUploads.gstCertificateFileName ? (
                         <div className="flex items-center justify-between p-3 border border-border rounded-md bg-muted/30">
                           <div className="flex items-center gap-2">
                             <Icon name="FileText" size={20} className="text-primary" />
-                            <span className="text-sm text-foreground">{fileUploads.panFileName}</span>
+                            <span className="text-sm text-foreground">{fileUploads.gstCertificateFileName}</span>
                           </div>
                           <Button
                             type="button"
                             variant="ghost"
                             size="sm"
-                            onClick={removePANFile}
+                            onClick={() => removeFile('gstCertificate')}
                             iconName="X"
                           >
                             Remove
@@ -570,16 +628,58 @@ const AddPersonalLoanPage = () => {
                           <input
                             type="file"
                             accept=".pdf,.jpg,.jpeg,.png"
-                            onChange={handlePANUpload}
+                            onChange={(e) => handleFileUpload(e, 'gstCertificate')}
                             className="hidden"
-                            id="pan-upload"
+                            id="gst-certificate-upload"
                           />
                           <label
-                            htmlFor="pan-upload"
+                            htmlFor="gst-certificate-upload"
                             className="flex flex-col items-center justify-center cursor-pointer"
                           >
                             <Icon name="Upload" size={32} className="text-muted-foreground mb-2" />
-                            <span className="text-sm text-foreground mb-1">Click to upload PAN Card</span>
+                            <span className="text-sm text-foreground mb-1">Click to upload GST Certificate</span>
+                            <span className="text-xs text-muted-foreground">PDF, JPG, PNG (Max 10MB)</span>
+                          </label>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Bank Statement */}
+                    <div>
+                      <label className="block text-sm font-medium text-foreground mb-2">
+                        Bank Statement (Last 6 months) <span className="text-destructive">*</span>
+                      </label>
+                      {fileUploads.bankStatementFileName ? (
+                        <div className="flex items-center justify-between p-3 border border-border rounded-md bg-muted/30">
+                          <div className="flex items-center gap-2">
+                            <Icon name="FileText" size={20} className="text-primary" />
+                            <span className="text-sm text-foreground">{fileUploads.bankStatementFileName}</span>
+                          </div>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => removeFile('bankStatement')}
+                            iconName="X"
+                          >
+                            Remove
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="border-2 border-dashed border-border rounded-md p-4">
+                          <input
+                            type="file"
+                            accept=".pdf,.jpg,.jpeg,.png"
+                            onChange={(e) => handleFileUpload(e, 'bankStatement')}
+                            className="hidden"
+                            id="bank-statement-upload"
+                          />
+                          <label
+                            htmlFor="bank-statement-upload"
+                            className="flex flex-col items-center justify-center cursor-pointer"
+                          >
+                            <Icon name="Upload" size={32} className="text-muted-foreground mb-2" />
+                            <span className="text-sm text-foreground mb-1">Click to upload Bank Statement</span>
                             <span className="text-xs text-muted-foreground">PDF, JPG, PNG (Max 10MB)</span>
                           </label>
                         </div>
@@ -593,7 +693,7 @@ const AddPersonalLoanPage = () => {
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => navigate('/personal-loans')}
+                    onClick={() => navigate('/loans-list')}
                     disabled={isSubmitting}
                   >
                     Cancel
@@ -617,5 +717,5 @@ const AddPersonalLoanPage = () => {
   );
 };
 
-export default AddPersonalLoanPage;
+export default AddBusinessLoanPage;
 

@@ -12,6 +12,8 @@ import LoanDetailsPage from './pages/loan-details';
 import LoansListPage from './pages/loans-list';
 import PersonalLoansPage from './pages/personal-loans';
 import AddPersonalLoanPage from './pages/personal-loans/add';
+import AddBusinessLoanPage from './pages/business-loans/add';
+import AddVehicleLoanPage from './pages/vehicle-loans/add';
 import DocumentsWorkflowPage from './pages/documents-workflow';
 import ProfilePage from './pages/profile';
 import { isAuthenticated } from './utils/auth';
@@ -92,6 +94,22 @@ const Routes: React.FC = () => {
             element={
               <ProtectedRoute>
                 <AddPersonalLoanPage />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/business-loans/add" 
+            element={
+              <ProtectedRoute>
+                <AddBusinessLoanPage />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/vehicle-loans/add" 
+            element={
+              <ProtectedRoute>
+                <AddVehicleLoanPage />
               </ProtectedRoute>
             } 
           />
