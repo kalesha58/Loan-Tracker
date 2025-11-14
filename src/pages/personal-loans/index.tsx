@@ -10,11 +10,9 @@ import LoansTable from '../loans-list/components/LoansTable';
 import Pagination from '../loans-list/components/Pagination';
 import { handleLogout as logout } from '../../utils/auth';
 import { Loan, LoanFilter, PaginationInfo } from '../loans-list/types';
-import AddPersonalLoanModal from './components/AddPersonalLoanModal';
 
 const PersonalLoansPage = () => {
   const navigate = useNavigate();
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [filter, setFilter] = useState<LoanFilter>({
     type: 'Personal',
     search: '',
@@ -83,10 +81,10 @@ const PersonalLoansPage = () => {
 
   const [loans, setLoans] = useState<Loan[]>(getLoans());
 
-  // Refresh loans from localStorage
-  const refreshLoans = () => {
+  // Refresh loans from localStorage when component mounts or when returning from add page
+  useEffect(() => {
     setLoans(getLoans());
-  };
+  }, []);
 
   // Filter and sort loans
   const filteredLoans = useMemo(() => {
@@ -176,10 +174,6 @@ const PersonalLoansPage = () => {
     logout(navigate);
   };
 
-  const handleModalClose = () => {
-    setIsModalOpen(false);
-    refreshLoans();
-  };
 
   return (
     <>
@@ -209,7 +203,7 @@ const PersonalLoansPage = () => {
                   variant="default"
                   iconName="Plus"
                   iconPosition="left"
-                  onClick={() => setIsModalOpen(true)}
+                  onClick={() => navigate('/personal-loans/add')}
                 >
                   Add Personal Loan
                 </Button>
@@ -269,7 +263,7 @@ const PersonalLoansPage = () => {
                   variant="default"
                   iconName="Plus"
                   iconPosition="left"
-                  onClick={() => setIsModalOpen(true)}
+                  onClick={() => navigate('/personal-loans/add')}
                 >
                   Add Personal Loan
                 </Button>
@@ -277,12 +271,6 @@ const PersonalLoansPage = () => {
             )}
           </div>
         </main>
-
-        {/* Add Personal Loan Modal */}
-        <AddPersonalLoanModal
-          isOpen={isModalOpen}
-          onClose={handleModalClose}
-        />
       </div>
     </>
   );
